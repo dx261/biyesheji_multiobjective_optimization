@@ -1,0 +1,81 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import copy
+import numpy as np
+
+# 输出显示不限制长度
+np.set_printoptions(threshold=np.inf)
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_rows', None)
+
+df = pd.read_excel(r"C:\Users\12832\Desktop\bestfeature_virturesamples_test.xlsx",sheet_name=0)
+# 如果有重复值，则保留第一个
+len1 = len(df.iloc[:, 0])
+df.drop_duplicates(keep='first', inplace=True)
+len2 = len(df.iloc[:, 0])
+remain_index = df.index.values
+all_index = range(len1)
+del_index = [i for i in all_index if i not in remain_index]
+print('删除的重复值的索引：', del_index)
+print('Original set  ---> ', len1, '\ndroped duplicates   ---> ', len1 - len2)
+
+df1 = df.copy()
+
+df = df1.drop(["composition"], axis=1)
+
+# 不用这个会造成x和all_data内存地址相同,两个有一个改变就会全变
+all_data = copy.deepcopy(df)
+
+std = StandardScaler()
+
+print('\033[1mStandardardization'.center(120))
+df_std = std.fit_transform(df)
+df_std = pd.DataFrame(df_std, columns=df.columns,index=df.index)
+# print(df_std.describe())
+df_std.to_excel(r'C:\Users\12832\Desktop\bestfeature_virturesamples_test_std.xlsx')
+
+NSGAarray=[]#使用NSGA-Ⅱ求解得到的标准化特征
+
+# 把科学计数的格式转换成正常小数格式
+NSGAarray_new=[]
+subarray=[]
+for i in range(len(NSGAarray)):
+      for j in range(len(NSGAarray[i])):
+            subarray.append('%.13f' % NSGAarray[i][j])
+            #print(subarray)
+      NSGAarray_new.append(subarray)
+      subarray=[]
+# print(NSGAarray_new)
+
+#计算欧氏距离的准备工作
+df2=[]
+dfa=pd.read_excel(r'C:\Users\12832\Desktop\bestfeature_virturesamples_test_std.xlsx')
+for i in range(len(dfa.iloc[:, 0])):
+      a=dfa.iloc[i,:].tolist()
+      df2.append(a)
+print(df2)
+
+#df2是虚拟样本的特征向量列表，NSGAarray_new是帕累托前沿对应的特征向量，现在求欧氏距离
+import math
+samples=[[] for _ in range(111)]
+sampledistance=[[]for _ in range(111)]
+for k in range(111):
+   for i in range(len(df2)):
+      for j in range(1,24):
+            a=[]
+            distancesingle=float(df2[i][j])-float(NSGAarray_new[k][j-1])
+            pingfang=math.pow(distancesingle, 2)
+            a.append(pingfang)
+      total=sum(a)
+      distance=math.sqrt(total)
+      #print(distance)
+      if len(samples[k]) < 5:
+            samples[k].append(df2[i])
+            sampledistance[k].append(distance)
+      else:
+            max_dist_index = sampledistance[k].index(max(sampledistance[k]))
+            if distance < max(sampledistance[k]):
+             samples[k][max_dist_index] = df2[i]
+             sampledistance[k][max_dist_index] = distance
+   #print(samples[k])
+print(samples)
