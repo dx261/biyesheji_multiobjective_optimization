@@ -1,0 +1,60 @@
+import matplotlib.pyplot as plt
+# unused but required import for doing 3d projections with matplotlib < 3.2
+import mpl_toolkits.mplot3d  # noqa: F401
+import numpy as np
+import pandas as pd
+from sklearn import datasets, decomposition
+from sklearn.preprocessing import StandardScaler
+
+plt.rcParams['font.sans-serif'] = ['Times New Roman']
+
+# 若需要投影至三维空间则使用以下语句
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+
+df3=[]
+df=pd.read_excel(r"C:\Users\12832\Desktop\bestfeature_badsamples_std1.xlsx", sheet_name=0)#劣类样本
+for i in range(len(df.iloc[:, 0])):
+      c=df.iloc[i,:].tolist()
+      df3.append(c)
+X3=df3
+
+
+df4=[]
+df=pd.read_excel(r"C:\Users\12832\Desktop\bestfeature_goodsamples_std1.xlsx", sheet_name=0)#优类样本
+for i in range(len(df.iloc[:, 0])):
+      d=df.iloc[i,:].tolist()
+      df4.append(d)
+X4=df4
+
+df5=[]
+df=pd.read_excel(r"C:\Users\12832\Desktop\test_elements_dropped.xlsx", sheet_name=3)#5个虚拟样本
+for i in range(len(df.iloc[:, 0])):
+      d=df.iloc[i,:].tolist()
+      df5.append(d)
+X5=df5
+
+pca = decomposition.PCA(n_components=2)
+pca.fit(X3)
+X33 = pca.transform(X3)
+pca.fit(X4)
+factorAnalysis.fit(X4)
+X44 = pca.transform(X4)
+pca.fit(X5)
+factorAnalysis.fit(X5)
+X55 = pca.transform(X5)
+
+plt.scatter(X33[:, 0], X33[:, 1], c='red', s=14, label='bad samples')
+plt.scatter(X44[:, 0], X44[:, 1], c='green', s=14, label='good samples')
+plt.scatter(X55[:, 0], X55[:, 1], c='gold', marker="*", s=48, label='designed samples')
+
+# 若需要投影至三维空间则使用以下语句
+# ax.scatter3D(X33[:, 0], X33[:, 1], X33[:, 2], c='red', s=14, label='bad samples')
+# ax.scatter3D(X44[:, 0], X44[:, 1], X44[:, 2], c='green', s=14, label='good samples')
+# ax.scatter3D(X55[:, 0], X55[:, 1], X55[:, 2], c='gold', marker="*", s=48, label='designed samples')
+
+plt.xlabel('PCA1', size=13)
+plt.ylabel('PCA2', size=13)
+plt.legend()
+
+plt.show()
