@@ -28,7 +28,7 @@ for i in range(len(df.iloc[:, 0])):
 X4=df4
 
 df5=[]
-df=pd.read_excel(r"C:\Users\12832\Desktop\test_elements_dropped.xlsx", sheet_name=3)#5个虚拟样本
+df=pd.read_excel(r"C:\Users\12832\Desktop\test_elements_dropped.xlsx", sheet_name=3)#最佳候选虚拟样本
 for i in range(len(df.iloc[:, 0])):
       d=df.iloc[i,:].tolist()
       df5.append(d)
